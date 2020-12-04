@@ -1,1 +1,32 @@
 // Welcome to the tutorial!
+
+import { createServer, Model } from "miragejs";
+
+export default function () {
+  createServer({
+    models: {
+      reminder: Model,
+    },
+
+    seeds(server) {
+      server.create("reminder", { text: "Walk the dog" });
+      server.create("reminder", { text: "Take out the trash" });
+      server.create("reminder", { text: "Work out" });
+    },
+
+    routes() {
+      this.get("/api/reminders", (schema) => schema.reminders.all());
+
+      this.post("/api/reminders", (schema, request) => {
+        const attrs = JSON.parse(request.requestBody);
+        return schema.reminders.create(attrs);
+      });
+
+      this.delete("/api/reminders/:id", (schema, request) => {
+        let id = request.params.id;
+
+        return schema.reminders.find(id).destroy();
+      });
+    },
+  });
+}
